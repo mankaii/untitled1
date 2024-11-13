@@ -1,3 +1,4 @@
+// models/challenge.dart
 import 'package:flutter/material.dart';
 
 class Challenge {
@@ -7,8 +8,8 @@ class Challenge {
   final int points;
   final String type; // 'daily', 'weekly', 'special'
   final IconData icon;
-  bool isCompleted;
   final DateTime? deadline;
+  bool isCompleted;
 
   Challenge({
     required this.id,
@@ -17,8 +18,8 @@ class Challenge {
     required this.points,
     required this.type,
     required this.icon,
-    this.isCompleted = false,
     this.deadline,
+    this.isCompleted = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,8 +28,8 @@ class Challenge {
     'description': description,
     'points': points,
     'type': type,
-    'isCompleted': isCompleted,
     'deadline': deadline?.toIso8601String(),
+    'isCompleted': isCompleted,
   };
 
   factory Challenge.fromJson(Map<String, dynamic> json) => Challenge(
@@ -37,8 +38,8 @@ class Challenge {
     description: json['description'],
     points: json['points'],
     type: json['type'],
-    icon: Icons.star, // 아이콘은 기본값으로 설정
-    isCompleted: json['isCompleted'],
+    icon: Icons.star, // 기본 아이콘
     deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : null,
+    isCompleted: json['isCompleted'] ?? false,
   );
 }

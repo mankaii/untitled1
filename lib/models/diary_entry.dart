@@ -4,8 +4,8 @@ class DiaryEntry {
   final DateTime date;
   final String content;
   final String mood;
-  final int smokingDesireLevel; // 흡연 욕구 레벨 (1-5)
-  final String copingStrategy; // 흡연 욕구 대처 방법
+  final int smokingDesireLevel;
+  final String copingStrategy;
 
   DiaryEntry({
     required this.id,
@@ -33,17 +33,4 @@ class DiaryEntry {
     smokingDesireLevel: json['smokingDesireLevel'],
     copingStrategy: json['copingStrategy'],
   );
-}
-
-// 감정 통계를 위한 클래스
-class MoodStats {
-  final Map<String, int> moodCounts;
-  final double averageSmokingDesire;
-  final List<DiaryEntry> recentEntries;
-
-  MoodStats({
-    required this.moodCounts,
-    required this.averageSmokingDesire,
-    required this.recentEntries,
-  });
 }
