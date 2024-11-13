@@ -59,23 +59,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // 캐릭터 아이템들
       ProfileItem(
         id: 'char_1',
-        name: '건강한 토끼',
-        description: '활기찬 토끼',
-        requiredPoints: 200,
+        name: '스털링',
+        description: '가장 털털한 스털링',
+        requiredPoints: 10,
         category: '캐릭터',
-        imageAsset: 'assets/characters/rabbit.png',
+        imageAsset: 'assets/characters/basicSterling.png',
         tier: 1,
-        unlockMessage: '첫 번째 캐릭터 해금! 건강한 토끼처럼 활기차게 시작해보세요.',
+        unlockMessage: '첫 번째 캐릭터 해금! 스털링과 활기차게 시작해보세요.',
       ),
       ProfileItem(
         id: 'char_2',
-        name: '운동하는 곰',
-        description: '건강한 생활을 하는 곰',
-        requiredPoints: 400,
+        name: '운동 스털링',
+        description: '건강한 생활을 하는 스털링',
+        requiredPoints: 100,
         category: '캐릭터',
-        imageAsset: 'assets/characters/bear.png',
+        imageAsset: 'assets/characters/workOutSterling.png',
         tier: 2,
-        unlockMessage: '두 번째 캐릭터 해금! 건강한 생활을 실천하는 곰이 되어보세요.',
+        unlockMessage: '두 번째 캐릭터 해금! 건강한 생활을 실천하는 스털링과 함께해요.',
       ),
       // 뱃지 아이템들
       ProfileItem(
