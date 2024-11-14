@@ -145,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       case 2:
         _navigateWithAnimation(
           ChallengeScreen(
+            userSettings: widget.settings, // 추가된 부분
             onPointsEarned: (points) {
               setState(() {
                 _points += points;
@@ -287,7 +288,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           equippedItems: context.watch<ProfileProvider>().equippedItems,
                         ),
                         const SizedBox(height: 20),
-// 여기에 설문 카드 추가
                         DailySurveyCard(
                           onTap: () {
                             _navigateWithAnimation(
@@ -317,6 +317,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           onChallengeTap: () {
                             _navigateWithAnimation(
                               ChallengeScreen(
+                                userSettings: widget.settings, // 추가된 부분
                                 onPointsEarned: (points) {
                                   setState(() {
                                     _points += points;

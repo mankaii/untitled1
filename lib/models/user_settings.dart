@@ -16,6 +16,12 @@ class UserSettings {
     this.goal,
   });
 
+  int get totalSavings {
+    int daysSinceQuit = DateTime.now().difference(quitDate).inDays;
+    int savedCigarettes = daysSinceQuit * cigarettesPerDay;
+    return savedCigarettes * cigarettePrice;
+  }
+
   Map<String, dynamic> toJson() => {
     'quitDate': quitDate.toIso8601String(),
     'nickname': nickname,
