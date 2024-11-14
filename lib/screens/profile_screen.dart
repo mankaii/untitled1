@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:untitled1/models/profile_item.dart';
+import '../provider/profile_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   final int currentPoints;
@@ -31,7 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadEquippedItems();
     _checkAndUnlockItems();
   }
-
   // 아이템 초기 데이터
   void _loadItems() {
     _items = [
@@ -63,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         description: '가장 털털한 스털링',
         requiredPoints: 10,
         category: '캐릭터',
-        imageAsset: 'assets/characters/basicSterling.jpg',
+        imageAsset: 'assets/characters/basicSterling.png',
         tier: 1,
         unlockMessage: '첫 번째 캐릭터 해금! 스털링과 활기차게 시작해보세요.',
       ),
@@ -73,9 +74,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
         description: '건강한 생활을 하는 스털링',
         requiredPoints: 100,
         category: '캐릭터',
-        imageAsset: 'assets/characters/workOutSterling.jpg',
+        imageAsset: 'assets/characters/workOutSterling.png',
         tier: 2,
         unlockMessage: '두 번째 캐릭터 해금! 건강한 생활을 실천하는 스털링과 함께해요.',
+      ),
+      ProfileItem(
+        id: 'char_3',
+        name: '개발자 스털링',
+        description: '개발에 지친 스털링',
+        requiredPoints: 300,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/developerSterling.png',
+        tier: 3,
+        unlockMessage: '세 번째 캐릭터 해금! 지친 개발자 스털링을 위로해서 함께 아자아자!',
+      ),
+      ProfileItem(
+        id: 'char_4',
+        name: '비즈니스맨 스털링',
+        description: '사회에서 인정받는 유능한 스털링',
+        requiredPoints: 500,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/BusinessSterling.png',
+        tier: 4,
+        unlockMessage: '네 번째 캐릭터 해금! 바쁜 일상 속 살아남기! 비즈니스맨 스털링과 함께해요.',
+      ),
+      ProfileItem(
+        id: 'char_5',
+        name: '소녀 스털링',
+        description: '발랄하고 상큼한 소녀 스털링',
+        requiredPoints: 700,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/girlSterling.png',
+        tier: 2,
+        unlockMessage: '다섯 번째 캐릭터 해금! 소녀 스털링과 함께 행복 가득한 여정을 떠나보세요!',
+      ),
+      ProfileItem(
+        id: 'char_6',
+        name: '태권도 스털링',
+        description: '강인한 태권도 수련 중인 스털링',
+        requiredPoints: 900,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/taekwondoSterling.png',
+        tier: 2,
+        unlockMessage: '여섯 번째 캐릭터 해금! 태권도 스털링과 함께 강인함을 키워보세요!',
+      ),
+      ProfileItem(
+        id: 'char_7',
+        name: '기본 스털링',
+        description: '가장 베이직한 모습의 스털링',
+        requiredPoints: 1200,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/sterling.png',
+        tier: 1,
+        unlockMessage: '스털링 해금! 스털링과 여정을 함께 시작해봅시다!',
+      ),
+      ProfileItem(
+        id: 'char_8',
+        name: '학생 스털링',
+        description: '끊임없이 배움을 추구하는 스털링',
+        requiredPoints: 1500,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/studentGirlSterling.png',
+        tier: 1,
+        unlockMessage: '여덟 번째 캐릭터 해금! 학구적인 스털링과 함께 성장해봐요!',
+      ),
+      ProfileItem(
+        id: 'char_9',
+        name: '부자 스털링',
+        description: '화려한 생활을 즐기는 스털링',
+        requiredPoints: 3000,
+        category: '캐릭터',
+        imageAsset: 'assets/characters/richSterling.png',
+        tier: 5,
+        unlockMessage: '마지막 캐릭터 해금! 부자 스털링과 함께 성공을 향해 나아가요!',
       ),
       // 뱃지 아이템들
       ProfileItem(
@@ -184,6 +255,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _equippedItems[item.category] = item;
     });
     _saveEquippedItems();
+
+    context.read<ProfileProvider>().updateEquippedItem(item.category, item);
   }
 
   @override
@@ -239,6 +312,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     child: Image.asset(
     _equippedItems['배경']!.imageAsset,
     fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+    print(
+    'Error loading background: ${_equippedItems['배경']!
+        .imageAsset}');
+    return Container(color: Colors.grey[100]);
+    },
     ),
     ),
     ),
@@ -248,6 +327,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     child: Image.asset(
     _equippedItems['캐릭터']!.imageAsset,
     height: 120,
+    errorBuilder: (context, error, stackTrace) {
+    print('Error loading character: ${_equippedItems['캐릭터']!
+        .imageAsset}');
+    return Icon(Icons.person, size: 80, color: Colors.grey);
+    },
     ),
     ),
     // 프레임
@@ -256,6 +340,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     child: Image.asset(
     _equippedItems['프레임']!.imageAsset,
     fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+    print('Error loading frame: ${_equippedItems['프레임']!
+        .imageAsset}');
+    return SizedBox.shrink();
+    },
     ),
     ),
     // 뱃지
@@ -266,232 +355,252 @@ class _ProfileScreenState extends State<ProfileScreen> {
     child: Image.asset(
     _equippedItems['뱃지']!.imageAsset,
     height: 40,
-    ),
-    ),
-    ],
-    ),
-    ),
-
-    // 카테고리 선택
-    Container(
-    height: 50,
-    child: ListView.builder(
-    scrollDirection: Axis.horizontal,
-    itemCount: _categories.length,
-    itemBuilder: (context, index) {
-    final category = _categories[index];
-    return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 4),
-    child: ChoiceChip(
-    label: Text(category),
-    selected: _selectedCategory == category,
-    onSelected: (selected) {
-    setState(() {
-    _selectedCategory = category;
-    });
-    },
-    ),
-    );
+    errorBuilder: (context, error, stackTrace) {
+    print('Error loading badge: ${_equippedItems['뱃지']!
+        .imageAsset}');
+    return Icon(Icons.stars, size: 30, color: Colors.amber);
     },
     ),
     ),
-
-    // 아이템 목록
-    Expanded(
-    child: GridView.builder(
-    padding: EdgeInsets.all(16),
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-    childAspectRatio: 0.8,
-    crossAxisSpacing: 16,
-    mainAxisSpacing: 16,
-    ),
-    itemCount: _items
-        .where((item) => item.category == _selectedCategory)
-        .length,
-    itemBuilder: (context, index) {
-    final item = _items
-        .where((item) => item.category == _selectedCategory)
-        .toList()[index];
-    final isLocked = item.requiredPoints > widget.currentPoints;
-    final isEquipped = _equippedItems[item.category]?.id == item.id;
-
-    return GestureDetector(
-    onTap: isLocked
-    ? () {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-    content: Text(
-    '${item.requiredPoints}P가 필요합니다. (현재: ${widget.currentPoints}P)'
-    ),
-    ),
-    );
-    }
-        : () => _equipItem(item),
-    child: Card(
-    elevation: isEquipped ? 8 : 2,
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(16),
-    side: isEquipped
-    ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
-        : BorderSide.none,
-    ),
-    child: Stack(
-    children: [
-    Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-    Expanded(
-    flex: 2,
-    child: Container(
-    decoration: BoxDecoration(
-    color: Colors.grey[100],
-    borderRadius: BorderRadius.vertical(
-    top: Radius.circular(16),
-    ),
-    ),
-    child: Stack(
-    children: [
-    Center(
-    child: Image.asset(
-    item.imageAsset,
-    fit: BoxFit.cover,
-    ),
-    ),
-    if (isLocked)
-    Container(
-    color: Colors.black45,
-    child: Center(
-    child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Icon(
-    Icons.lock,
-    color: Colors.white,
-    size: 32,
-    ),
-    SizedBox(height: 4),
-    Text(
-    '${item.requiredPoints}P 필요',
-    style: TextStyle(
-    color: Colors.white,
-    fontWeight: FontWeight.bold,
-    ),
-    ),
     ],
     ),
-    ),
-    ),
-    ],
-    ),
-    ),
-    ),
-    Expanded(
-    flex: 1,
-    child: Padding(
-    padding: EdgeInsets.all(8),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-    Row(
-    children: [
-    Expanded(
-    child: Text(
-    item.name,
-    style: TextStyle(
-    fontWeight: FontWeight.bold,
-    ),
-    maxLines: 1,
-    overflow: TextOverflow.ellipsis,
-    ),
-    ),
-    Container(
-    padding: EdgeInsets.symmetric(
-    horizontal: 6,
-    vertical: 2,
-    ),
-    decoration: BoxDecoration(
-    color: _getTierColor(item.tier),
-    borderRadius: BorderRadius.circular(8),
-    ),
-    child: Text(
-    'Tier ${item.tier}',
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 10,
-      fontWeight: FontWeight.bold,
-    ),
-    ),
-    ),
-    ],
-    ),
-      SizedBox(height: 4),
-      Text(
-        item.description,
-        style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 12,
+    ),// 카테고리 선택
+      Container(
+        height: 50,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _categories.length,
+          itemBuilder: (context, index) {
+            final category = _categories[index];
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4),
+              child: ChoiceChip(
+                label: Text(category),
+                selected: _selectedCategory == category,
+                onSelected: (selected) {
+                  setState(() {
+                    _selectedCategory = category;
+                  });
+                },
+              ),
+            );
+          },
         ),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
+      ),
+
+      // 아이템 목록
+      Expanded(
+        child: GridView.builder(
+          padding: EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.8,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: _items
+              .where((item) => item.category == _selectedCategory)
+              .length,
+          itemBuilder: (context, index) {
+            final item = _items
+                .where((item) => item.category == _selectedCategory)
+                .toList()[index];
+            final isLocked = item.requiredPoints > widget.currentPoints;
+            final isEquipped = _equippedItems[item.category]?.id == item.id;
+
+            return GestureDetector(
+              onTap: isLocked
+                  ? () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${item.requiredPoints}P가 필요합니다. (현재: ${widget
+                          .currentPoints}P)',
+                    ),
+                  ),
+                );
+              }
+                  : () => _equipItem(item),
+              child: Card(
+                elevation: isEquipped ? 8 : 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: isEquipped
+                      ? BorderSide(color: Theme
+                      .of(context)
+                      .primaryColor, width: 2)
+                      : BorderSide.none,
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Image.asset(
+                                    item.imageAsset,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error,
+                                        stackTrace) {
+                                      print('Error loading item: ${item
+                                          .imageAsset}');
+                                      return Icon(
+                                        Icons.image_not_supported,
+                                        size: 40,
+                                        color: Colors.grey,
+                                      );
+                                    },
+                                  ),
+                                ),
+                                if (isLocked)
+                                  Container(
+                                    color: Colors.black45,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .center,
+                                        children: [
+                                          Icon(
+                                            Icons.lock,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            '${item.requiredPoints}P 필요',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getTierColor(item.tier),
+                                        borderRadius: BorderRadius.circular(
+                                            8),
+                                      ),
+                                      child: Text(
+                                        'Tier ${item.tier}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  item.description,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isEquipped)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme
+                                .of(context)
+                                .primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '착용중',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     ],
     ),
-    ),
-    ),
-    ],
-    ),
-      if (isEquipped)
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '착용중',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ),
-    ],
-    ),
-    ),
     );
-    },
-    ),
-    ),
-    ],
-    ),
-    );
-  }
+  }}
 
-  Color _getTierColor(int tier) {
-    switch (tier) {
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.blue;
-      case 3:
-        return Colors.purple;
-      case 4:
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
+// _getTierColor 메서드
+Color _getTierColor(int tier) {
+  switch (tier) {
+    case 1:
+      return Colors.green;
+    case 2:
+      return Colors.blue;
+    case 3:
+      return Colors.purple;
+    case 4:
+      return Colors.orange;
+    default:
+      return Colors.grey;
   }
 }
 
-// 해금 축하 다이얼로그
+// UnlockCelebrationDialog 클래스
 class UnlockCelebrationDialog extends StatelessWidget {
   final ProfileItem item;
 
@@ -507,25 +616,25 @@ class UnlockCelebrationDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 16),
-            Icon(
+            const SizedBox(height: 16),
+            const Icon(
               Icons.stars,
               size: 64,
               color: Colors.amber,
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               '🎉 새로운 아이템 해금! 🎉',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Container(
               height: 100,
               width: 100,
@@ -536,17 +645,25 @@ class UnlockCelebrationDialog extends StatelessWidget {
               child: Image.asset(
                 item.imageAsset,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading celebration item: ${item.imageAsset}');
+                  return Icon(
+                    Icons.image_not_supported,
+                    size: 40,
+                    color: Colors.grey,
+                  );
+                },
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               item.name,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               item.unlockMessage,
               textAlign: TextAlign.center,
@@ -554,10 +671,10 @@ class UnlockCelebrationDialog extends StatelessWidget {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('확인'),
+              child: const Text('확인'),
             ),
           ],
         ),

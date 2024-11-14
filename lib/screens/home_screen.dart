@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/user_settings.dart';
+import '../provider/profile_provider.dart';
+import '../models/profile_item.dart';
 import '../widgets/goal_card.dart' as goals;
 import '../widgets/profile_preview.dart';
 import '../widgets/stats_card.dart';
@@ -28,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   int _selectedIndex = 0;
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+  Map<String, ProfileItem> _equippedItems = {};
 
   @override
   void initState() {
@@ -50,13 +54,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
 
     _controller.forward();
+
+    // ProfileProvider의 상태 변경을 구독
+    context.read<ProfileProvider>().addListener(_onProfileProviderChanged);
   }
 
   @override
   void dispose() {
+    // ProfileProvider의 상태 변경 구독 해제
+    context.read<ProfileProvider>().removeListener(_onProfileProviderChanged);
     _timer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onProfileProviderChanged() {
+    setState(() {
+      // ProfileProvider의 equippedItems 상태를 업데이트
+      _equippedItems = context.read<ProfileProvider>().equippedItems;
+    });
   }
 
   void _calculatePoints() {
@@ -143,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         title: Column(
           children: [
             Text(
-              '${widget.settings.nickname}',
+              '${widget.settings.nickname}님,',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -151,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const Text(
-              '님의 금연 여정',
+              '금연 여정을 함께해요!',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF9094A6),
@@ -240,6 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               ProfileScreen(currentPoints: _points),
                             );
                           },
+                          equippedItems: context.watch<ProfileProvider>().equippedItems,
                         ),
                         const SizedBox(height: 24),
                         goals.GoalCard(

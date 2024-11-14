@@ -12,7 +12,7 @@ class ProfilePreview extends StatefulWidget {
   const ProfilePreview({
     Key? key,
     required this.points,
-    required this.onProfileTap,
+    required this.onProfileTap, required equippedItems,
   }) : super(key: key);
 
   @override
@@ -202,22 +202,32 @@ class _ProfilePreviewState extends State<ProfilePreview> {
                                 ),
                               ],
                             ),
-                            child: ClipOval(
-                              child: _equippedItems['캐릭터'] != null
-                                  ? Image.asset(
-                                _equippedItems['캐릭터']!.imageAsset,
-                                fit: BoxFit.cover,
-                              )
-                                  : Container(
-                                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                child: Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: Theme.of(context).primaryColor,
+                              child: ClipOval(
+                                child: _equippedItems['캐릭터'] != null
+                                    ? Image.asset(
+                                  _equippedItems['캐릭터']!.imageAsset,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print('Error loading image: ${_equippedItems['캐릭터']!.imageAsset}');
+                                    return Container(
+                                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                      child: Icon(
+                                        Icons.person,
+                                        size: 50,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    );
+                                  },
+                                )
+                                    : Container(
+                                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 50,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
+                              ),),
                           // 뱃지
                           if (_equippedItems['뱃지'] != null)
                             Positioned(
