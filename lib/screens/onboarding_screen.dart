@@ -122,12 +122,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '반갑습니다!',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineMedium,
           ),
           const SizedBox(height: 8),
           Text(
             '금연을 결심하신 것을 축하드립니다.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme
+                .of(context)
+                .textTheme
+                .bodyLarge,
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -156,7 +162,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '어떤 담배를 피우시나요?',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineSmall,
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -191,17 +200,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Icon(
                 _cigaretteTypes[index].icon,
                 size: 64,
-                color: Theme.of(context).primaryColor,
+                color: Theme
+                    .of(context)
+                    .primaryColor,
               ),
               const SizedBox(height: 16),
               Text(
                 _cigaretteTypes[index].name,
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
                 _cigaretteTypes[index].description,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyMedium,
               ),
             ],
           ),
@@ -209,6 +226,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+
   Widget _buildSmokingAmountPage() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -217,7 +235,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '하루에 몇 개비를 피우시나요?',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineSmall,
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -255,7 +276,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '언제부터 시작하시나요?',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineSmall,
           ),
           const SizedBox(height: 32),
           OutlinedButton.icon(
@@ -292,7 +316,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '금연 목표를 설정해주세요',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineSmall,
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -338,7 +365,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         canProceed = _nicknameController.text.isNotEmpty;
         break;
       case 1:
-        canProceed = true;  // 담배 종류는 기본값이 있음
+        canProceed = true; // 담배 종류는 기본값이 있음
         break;
       case 2:
         canProceed = _smokingAmountController.text.isNotEmpty;
@@ -405,13 +432,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         return;
       }
 
-      if (_targetDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('목표 날짜를 선택해주세요')),
-        );
-        return;
-      }
-
       if (_smokingAmountController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('하루 흡연량을 입력해주세요')),
@@ -420,22 +440,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       }
 
       final settings = UserSettings(
-        quitDate: _quitDate!,
-        nickname: _nicknameController.text.trim(),
-        cigaretteType: _cigaretteType,
-        cigarettesPerDay: int.parse(_smokingAmountController.text),
-        cigarettePrice: 4500,
-        goal: _goalController.text.trim(),
-        targetDate: _targetDate,
+          quitDate: _quitDate!,
+          nickname: _nicknameController.text.trim(),
+          cigaretteType: _cigaretteType,
+          cigarettesPerDay: int.parse(_smokingAmountController.text),
+          cigarettePrice: 4500,
+          goal: _goalController.text.trim()
       );
-
-      // Debug print
-      print('Settings being saved:');
-      print('Nickname: ${settings.nickname}');
-      print('Cigarettes per day: ${settings.cigarettesPerDay}');
-      print('Quit date: ${settings.quitDate}');
-      print('Goal: ${settings.goal}');
-      print('Target date: ${settings.targetDate}');
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userSettings', jsonEncode(settings.toJson()));

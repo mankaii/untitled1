@@ -9,9 +9,11 @@ import '../widgets/goal_card.dart' as goals;
 import '../widgets/profile_preview.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/achievement_card.dart' as achievements;
+import 'package:untitled1/widgets/daliy_survey_card.dart';
 import 'profile_screen.dart';
 import 'challenge_screen.dart';
 import 'chat_screen.dart';
+import 'daily_survey_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserSettings settings;
@@ -179,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ],
         ),
         actions: [
+          // 프로필 버튼만 남김
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
@@ -260,6 +263,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             );
                           },
                           equippedItems: context.watch<ProfileProvider>().equippedItems,
+                        ),
+                        const SizedBox(height: 20),
+// 여기에 설문 카드 추가
+                        DailySurveyCard(
+                          onTap: () {
+                            _navigateWithAnimation(
+                              DailySurveyScreen(
+                                onCigarettesUpdate: (cigarettes) {
+                                  setState(() {
+                                    _calculatePoints();
+                                  });
+                                },
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 24),
                         goals.GoalCard(

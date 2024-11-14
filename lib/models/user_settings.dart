@@ -5,7 +5,7 @@ class UserSettings {
   final int cigarettesPerDay;
   final int cigarettePrice;
   final String? goal;
-  final DateTime? targetDate;
+  // targetDate 제거
 
   UserSettings({
     required this.quitDate,
@@ -14,7 +14,6 @@ class UserSettings {
     required this.cigarettesPerDay,
     this.cigarettePrice = 4500,
     this.goal,
-    this.targetDate,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,7 +23,6 @@ class UserSettings {
     'cigarettesPerDay': cigarettesPerDay,
     'cigarettePrice': cigarettePrice,
     'goal': goal,
-    'targetDate': targetDate?.toIso8601String(),
   };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
@@ -34,28 +32,5 @@ class UserSettings {
     cigarettesPerDay: json['cigarettesPerDay'],
     cigarettePrice: json['cigarettePrice'] ?? 4500,
     goal: json['goal'],
-    targetDate: json['targetDate'] != null
-        ? DateTime.parse(json['targetDate'])
-        : null,
   );
-
-  UserSettings copyWith({
-    DateTime? quitDate,
-    String? nickname,
-    String? cigaretteType,
-    int? cigarettesPerDay,
-    int? cigarettePrice,
-    String? goal,
-    DateTime? targetDate,
-  }) {
-    return UserSettings(
-      quitDate: quitDate ?? this.quitDate,
-      nickname: nickname ?? this.nickname,
-      cigaretteType: cigaretteType ?? this.cigaretteType,
-      cigarettesPerDay: cigarettesPerDay ?? this.cigarettesPerDay,
-      cigarettePrice: cigarettePrice ?? this.cigarettePrice,
-      goal: goal ?? this.goal,
-      targetDate: targetDate ?? this.targetDate,
-    );
-  }
 }
