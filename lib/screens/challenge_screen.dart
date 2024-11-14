@@ -1,15 +1,21 @@
+// screens/challenge_screen.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
-import 'dart:convert';
 import '../models/challenge.dart';
+import 'dart:convert';
 
 class ChallengeScreen extends StatefulWidget {
   final Function(int) onPointsEarned;
+  final int savedMoney;
+  final int savedCigarettes;
+  final int consecutiveDays;
 
   const ChallengeScreen({
     Key? key,
     required this.onPointsEarned,
+    required this.savedMoney,
+    required this.savedCigarettes,
+    required this.consecutiveDays,
   }) : super(key: key);
 
   @override
@@ -18,219 +24,198 @@ class ChallengeScreen extends StatefulWidget {
 
 class _ChallengeScreenState extends State<ChallengeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  List<Challenge> _dailyChallenges = [];
-  List<Challenge> _weeklyChallenges = [];
-  List<Challenge> _specialChallenges = [];
+  List<Challenge> _challenges = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadChallenges();
+    _checkChallengeProgress();
   }
 
-  void _loadChallenges() {
-    // 일일 챌린지
-    _dailyChallenges = [
-      Challenge(
-        id: 'daily_1',
-        title: '물 마시기',
-        description: '오늘 물 8잔 마시기',
-        points: 50,
-        type: 'daily',
-        icon: Icons.water_drop,
-      ),
-      Challenge(
-        id: 'daily_2',
-        title: '산책하기',
-        description: '10분 이상 산책하기',
-        points: 50,
-        type: 'daily',
-        icon: Icons.directions_walk,
-      ),
-      Challenge(
-        id: 'daily_3',
-        title: '심호흡',
-        description: '심호흡 10번 하기',
-        points: 30,
-        type: 'daily',
-        icon: Icons.air,
-      ),
-      Challenge(
-        id: 'daily_4',
-        title: '과일 섭취',
-        description: '과일 한 개 먹기',
-        points: 30,
-        type: 'daily',
-        icon: Icons.apple,
-      ),
-    ];
+  Future<void> _loadChallenges() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedChallenges = prefs.getString('challenges');
 
-    // 주간 챌린지
-    _weeklyChallenges = [
-      Challenge(
-        id: 'weekly_1',
-        title: '운동 하기',
-        description: '이번 주 운동 3회 하기',
-        points: 200,
-        type: 'weekly',
-        icon: Icons.fitness_center,
-        deadline: DateTime.now().add(Duration(days: 7)),
-      ),
-      Challenge(
-        id: 'weekly_2',
-        title: '스트레스 관리',
-        description: '스트레스 관리 일지 5회 작성',
-        points: 150,
-        type: 'weekly',
-        icon: Icons.book,
-        deadline: DateTime.now().add(Duration(days: 7)),
-      ),
-    ];
-
-    // 특별 챌린지
-    _specialChallenges = [
-      Challenge(
-        id: 'special_1',
-        title: '첫 24시간',
-        description: '금연 첫 24시간 달성',
-        points: 500,
-        type: 'special',
-        icon: Icons.timer,
-      ),
-      Challenge(
-        id: 'special_2',
-        title: '일주일 달성',
-        description: '금연 7일 연속 달성',
-        points: 1000,
-        type: 'special',
-        icon: Icons.workspace_premium,
-      ),
-    ];
-  }
-
-  Future<void> _completeChallenge(Challenge challenge) async {
-    if (!challenge.isCompleted) {
+    if (savedChallenges != null) {
+      final List<dynamic> decodedChallenges = jsonDecode(savedChallenges);
       setState(() {
-        challenge.isCompleted = true;
+        _challenges = decodedChallenges
+            .map((c) => Challenge.fromJson(c))
+            .toList();
       });
-
-      // 포인트 적립
-      widget.onPointsEarned(challenge.points);
-
-      // 축하 다이얼로그 표시
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('챌린지 달성!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.celebration, size: 50, color: Colors.amber),
-              SizedBox(height: 16),
-              Text('축하합니다!\n${challenge.points}포인트를 획득했습니다!'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('확인'),
-            ),
-          ],
-        ),
-      );
+    } else {
+      setState(() {
+        _challenges = ChallengeData.defaultChallenges;
+      });
     }
   }
 
-  Widget _buildChallengeCard(Challenge challenge) {
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        leading: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            challenge.icon,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-        title: Text(
-          challenge.title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            decoration: challenge.isCompleted ? TextDecoration.lineThrough : null,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  void _checkChallengeProgress() {
+    for (var challenge in _challenges) {
+      // 금연 재테크 도전과제 체크
+      if (challenge.id.startsWith('finance_')) {
+        challenge.conditions[0].currentValue = widget.savedMoney;
+      }
+
+      // 환경 보호 도전과제 체크
+      if (challenge.id.startsWith('environment_')) {
+        challenge.conditions[0].currentValue = widget.savedCigarettes;
+      }
+
+      // 건강 관련 도전과제 체크
+      if (challenge.id.startsWith('health_')) {
+        challenge.conditions[0].currentValue = widget.consecutiveDays;
+      }
+
+      // 도전과제 완료 체크
+      if (!challenge.isCompleted &&
+          challenge.conditions.every((c) => c.isCompleted)) {
+        _completeChallenge(challenge);
+      }
+    }
+    _saveChallenges();
+  }
+
+  Future<void> _saveChallenges() async {
+    final prefs = await SharedPreferences.getInstance();
+    final challengesJson = jsonEncode(
+      _challenges.map((c) => c.toJson()).toList(),
+    );
+    await prefs.setString('challenges', challengesJson);
+  }
+
+  void _completeChallenge(Challenge challenge) {
+    setState(() {
+      challenge.isCompleted = true;
+    });
+
+    widget.onPointsEarned(challenge.requiredPoints);
+
+    _showCompletionDialog(challenge);
+  }
+
+  void _showCompletionDialog(Challenge challenge) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
           children: [
-            Text(challenge.description),
-            if (challenge.deadline != null)
-              Text(
-                '마감: ${DateFormat('yyyy-MM-dd').format(challenge.deadline!)}',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+            Icon(Icons.emoji_events, color: Colors.amber),
+            SizedBox(width: 8),
+            Text('도전과제 달성!'),
           ],
         ),
-        trailing: challenge.isCompleted
-            ? Icon(Icons.check_circle, color: Colors.green)
-            : Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            '+${challenge.points}P',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('축하합니다!'),
+            SizedBox(height: 8),
+            Text('획득한 칭호: ${challenge.rewardTitle}'),
+            SizedBox(height: 8),
+            Text('환경 영향: ${challenge.environmentalImpact}'),
+            SizedBox(height: 8),
+            Text('보상: ${challenge.requiredPoints} 포인트'),
+          ],
         ),
-        onTap: () => _completeChallenge(challenge),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('확인'),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final achievements = _challenges.where((c) => c.type == ChallengeType.achievement).toList();
+    final specialChallenges = _challenges.where((c) => c.type == ChallengeType.special).toList();
+    final dailyChallenges = _challenges.where((c) => c.type == ChallengeType.daily).toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('도전 과제'),
+        title: Text('도전과제'),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: '일일'),
-            Tab(text: '주간'),
+            Tab(text: '업적'),
             Tab(text: '특별'),
+            Tab(text: '일일'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 일일 챌린지 목록
-          ListView.builder(
-            itemCount: _dailyChallenges.length,
-            itemBuilder: (context, index) => _buildChallengeCard(_dailyChallenges[index]),
-          ),
-          // 주간 챌린지 목록
-          ListView.builder(
-            itemCount: _weeklyChallenges.length,
-            itemBuilder: (context, index) => _buildChallengeCard(_weeklyChallenges[index]),
-          ),
-          // 특별 챌린지 목록
-          ListView.builder(
-            itemCount: _specialChallenges.length,
-            itemBuilder: (context, index) => _buildChallengeCard(_specialChallenges[index]),
-          ),
+          _buildChallengeList(achievements),
+          _buildChallengeList(specialChallenges),
+          _buildChallengeList(dailyChallenges),
         ],
       ),
+    );
+  }
+
+  Widget _buildChallengeList(List<Challenge> challenges) {
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: challenges.length,
+      itemBuilder: (context, index) {
+        final challenge = challenges[index];
+        return Card(
+          child: ListTile(
+            leading: Icon(
+              challenge.icon,
+              color: challenge.isCompleted ? Colors.amber : Colors.grey,
+              size: 32,
+            ),
+            title: Text(
+              challenge.title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                decoration: challenge.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(challenge.description),
+                SizedBox(height: 4),
+                ...challenge.conditions.map((condition) {
+                  final progress = condition.currentValue / condition.targetValue;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${condition.description}: ${condition.currentValue}/${condition.targetValue}',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      LinearProgressIndicator(
+                        value: progress.clamp(0, 1),
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          progress >= 1 ? Colors.green : Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
+            trailing: challenge.isCompleted
+                ? Tooltip(
+              message: challenge.rewardTitle,
+              child: Icon(Icons.workspace_premium, color: Colors.amber),
+            )
+                : Text('${challenge.requiredPoints}P'),
+          ),
+        );
+      },
     );
   }
 

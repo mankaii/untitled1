@@ -135,6 +135,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 _points += points;
               });
             },
+            savedMoney: _calculateSavedMoney(),
+            savedCigarettes: _calculateSavedCigarettes(),
+            consecutiveDays: DateTime.now().difference(widget.settings.quitDate).inDays,
           ),
         );
         break;
@@ -261,7 +264,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         const SizedBox(height: 24),
                         goals.GoalCard(
                           goal: widget.settings.goal ?? '목표를 설정해주세요',
-                          targetDate: widget.settings.targetDate,
                           quitDate: widget.settings.quitDate,
                         ),
                         const SizedBox(height: 24),
@@ -280,6 +282,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     _points += points;
                                   });
                                 },
+                                savedMoney: _calculateSavedMoney(),
+                                savedCigarettes: _calculateSavedCigarettes(),
+                                consecutiveDays: DateTime.now().difference(widget.settings.quitDate).inDays,
                               ),
                             );
                           },
