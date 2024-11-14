@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/user_settings.dart';
@@ -14,6 +16,8 @@ import 'profile_screen.dart';
 import 'challenge_screen.dart';
 import 'chat_screen.dart';
 import 'daily_survey_screen.dart';
+import 'health_status_screen.dart';
+import 'package:untitled1/models/daily_survey.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserSettings settings;
@@ -34,6 +38,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   Map<String, ProfileItem> _equippedItems = {};
+
+  Future<List<DailySurvey>> _loadSurveys() async {
+    final prefs = await SharedPreferences.getInstance();
+    final surveys = prefs.getStringList('daily_surveys') ?? [];
+
+    return surveys.map((surveyJson) {
+      return DailySurvey.fromJson(jsonDecode(surveyJson));
+    }).toList();
+  }
 
   @override
   void initState() {
@@ -116,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     setState(() => _selectedIndex = 0);
   }
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {  // async 추가
     if (_selectedIndex == index) return;
 
     setState(() {
@@ -140,6 +153,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             savedMoney: _calculateSavedMoney(),
             savedCigarettes: _calculateSavedCigarettes(),
             consecutiveDays: DateTime.now().difference(widget.settings.quitDate).inDays,
+          ),
+        );
+        break;
+      case 3:
+        final surveys = await _loadSurveys();  // 설문 데이터 로드
+        _navigateWithAnimation(
+          HealthStatusScreen(
+            settings: widget.settings,
+            surveys: surveys,
           ),
         );
         break;
@@ -352,6 +374,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               BottomNavigationBarItem(
                 icon: Icon(Icons.emoji_events_rounded),
                 label: '도전',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.health_and_safety_rounded),
+                label: '건강',
               ),
             ],
           ),

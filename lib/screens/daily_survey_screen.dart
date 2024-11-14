@@ -1,7 +1,7 @@
 // screens/daily_survey_screen.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled1/models/dairy_survey.dart';
+import 'package:untitled1/models/daily_survey.dart';
 import 'dart:convert';
 
 class DailySurveyScreen extends StatefulWidget {

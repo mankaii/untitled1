@@ -1,4 +1,7 @@
 // models/daily_survey.dart
+import 'package:flutter/material.dart';
+import 'dart:convert';
+
 class DailySurvey {
   final DateTime date;
   final bool isSmokeFree;

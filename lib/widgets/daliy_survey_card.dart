@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:untitled1/models/dairy_survey.dart';
+import 'package:untitled1/models/daily_survey.dart';
 
 // widgets/daily_survey_card.dart
 class DailySurveyCard extends StatelessWidget {
