@@ -24,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _showUnlockAnimation = false;
   ProfileItem? _justUnlockedItem;
 
-  final List<String> _categories = ['배경', '캐릭터', '뱃지', '프레임'];
+  final List<String> _categories = ['배경', '캐릭터', '뱃지'];
 
   @override
   void initState() {
@@ -39,24 +39,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // 배경 아이템들
       ProfileItem(
         id: 'bg_1',
+        name: '마을',
+        description: '새로운 시작을 알리는 마을',
+        requiredPoints: 0,
+        category: '배경',
+        imageAsset: 'assets/backgrounds/hill.jpg',
+        tier: 1,
+        unlockMessage: '첫 배경 해금! 새로운 아침이 밝았습니다.',
+      ),
+      ProfileItem(
+        id: 'bg_2',
         name: '푸른 하늘',
         description: '맑은 하늘처럼 상쾌한 마음',
         requiredPoints: 100,
         category: '배경',
         imageAsset: 'assets/backgrounds/sky.png',
-        tier: 1,
-        unlockMessage: '첫 번째 배경을 해금했습니다! 맑은 하늘처럼 상쾌한 마음으로 시작해보세요.',
+        tier: 2,
+        unlockMessage: '맑은 하늘처럼 상쾌한 마음으로 시작해보세요.',
       ),
       ProfileItem(
-        id: 'bg_2',
-        name: '일출',
-        description: '새로운 시작을 알리는 아침',
+        id: 'bg_3',
+        name: '경찰서 앞',
+        description: '난 떳떳하다구',
         requiredPoints: 300,
         category: '배경',
-        imageAsset: 'assets/backgrounds/sunrise.png',
-        tier: 2,
-        unlockMessage: '두 번째 배경 해금! 새로운 아침이 밝았습니다.',
+        imageAsset: 'assets/backgrounds/police.jpg',
+        tier: 3,
+        unlockMessage: '배경 해금! 이번엔 경찰서 앞에서 보네요.',
       ),
+      ProfileItem(
+        id: 'bg_4',
+        name: '전철역',
+        description: '어딜 가는 걸까요?',
+        requiredPoints: 500,
+        category: '배경',
+        imageAsset: 'assets/backgrounds/station.jpg',
+        tier: 4,
+        unlockMessage: '배경 해금! 어딜 가시려구요?',
+      ),
+      ProfileItem(
+        id: 'bg_5',
+        name: '경복궁',
+        description: '아름다운 서울의 랜드마크죠',
+        requiredPoints: 1000,
+        category: '배경',
+        imageAsset: 'assets/backgrounds/moonhwajae.jpg',
+        tier: 4,
+        unlockMessage: '배경 해금! 경복궁 한 번 보고가는거 어때요?',
+      ),
+      ProfileItem(
+        id: 'bg_6',
+        name: '고향',
+        description: '가장 따뜻한 마을',
+        requiredPoints: 3000,
+        category: '배경',
+        imageAsset: 'assets/backgrounds/hometown.jpg',
+        tier: 4,
+        unlockMessage: '마지막 배경 해금! 고향은 가장 아름다운 마을이죠.',
+      ),
+
       // 캐릭터 아이템들
       ProfileItem(
         id: 'char_1',
@@ -161,34 +202,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       ProfileItem(
         id: 'badge_2',
-        name: '의지의 상징',
-        description: '금연 7일 달성',
+        name: '바나나',
+        description: '금연 3일 달성',
+        requiredPoints: 150,
+        category: '뱃지',
+        imageAsset: 'assets/badges/banana.png',
+        tier: 2,
+        unlockMessage: '스털링이 사랑하는 바나나군요!',
+      ),
+      ProfileItem(
+        id: 'badge_3',
+        name: '나무',
+        description: '제법인데요',
+        requiredPoints: 300,
+        category: '뱃지',
+        imageAsset: 'assets/badges/babytree.png',
+        tier: 3,
+        unlockMessage: '당신의 빛나는 의지가 꽃피운 나무입니다.',
+      ),
+      ProfileItem(
+        id: 'badge_4',
+        name: '금연할테야',
+        description: '당신의 의지가 불타오릅니다',
         requiredPoints: 500,
         category: '뱃지',
-        imageAsset: 'assets/badges/willpower.png',
-        tier: 2,
-        unlockMessage: '의지의 상징 뱃지 획득! 당신의 의지가 빛나고 있습니다.',
-      ),
-      // 프레임 아이템들
-      ProfileItem(
-        id: 'frame_1',
-        name: '골드 프레임',
-        description: '고급스러운 골드 테두리',
-        requiredPoints: 150,
-        category: '프레임',
-        imageAsset: 'assets/frames/gold.png',
-        tier: 1,
-        unlockMessage: '첫 번째 프레임 해금! 골드 프레임으로 프로필을 꾸며보세요.',
+        imageAsset: 'assets/badges/noSmoke.png',
+        tier: 4,
+        unlockMessage: '당신의 빛나는 의지가 꽃피운 나무입니다.',
       ),
       ProfileItem(
-        id: 'frame_2',
-        name: '반짝이는 다이아',
-        description: '빛나는 다이아몬드 테두리',
-        requiredPoints: 600,
-        category: '프레임',
-        imageAsset: 'assets/frames/diamond.png',
-        tier: 2,
-        unlockMessage: '최고급 다이아 프레임 해금! 당신의 노력이 빛나는 순간입니다.',
+        id: 'badge_5',
+        name: '왕관',
+        description: '당신은 대단해요',
+        requiredPoints: 10000,
+        category: '뱃지',
+        imageAsset: 'assets/badges/crown.png',
+        tier: 5,
+        unlockMessage: '금연을 거의 달성한 당신. 의지력이 참 대단해요.',
       ),
     ];
   }
@@ -289,7 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     children: [
     // 프로필 미리보기
     Container(
-    height: 200,
+    height: 400,
     margin: EdgeInsets.all(16),
     decoration: BoxDecoration(
     color: Colors.white,
@@ -326,7 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Center(
     child: Image.asset(
     _equippedItems['캐릭터']!.imageAsset,
-    height: 120,
+    height: 400,
     errorBuilder: (context, error, stackTrace) {
     print('Error loading character: ${_equippedItems['캐릭터']!
         .imageAsset}');
@@ -334,27 +384,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     },
     ),
     ),
-    // 프레임
-    if (_equippedItems['프레임'] != null)
-    Positioned.fill(
-    child: Image.asset(
-    _equippedItems['프레임']!.imageAsset,
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-    print('Error loading frame: ${_equippedItems['프레임']!
-        .imageAsset}');
-    return SizedBox.shrink();
-    },
-    ),
-    ),
+
     // 뱃지
     if (_equippedItems['뱃지'] != null)
     Positioned(
-    top: 16,
-    right: 16,
+    top: 20,
+    right: 10,
     child: Image.asset(
     _equippedItems['뱃지']!.imageAsset,
-    height: 40,
+    height: 50,
     errorBuilder: (context, error, stackTrace) {
     print('Error loading badge: ${_equippedItems['뱃지']!
         .imageAsset}');
