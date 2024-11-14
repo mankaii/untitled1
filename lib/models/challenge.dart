@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 
 enum ChallengeType {
-  daily,    // 일일 도전과제
-  weekly,   // 주간 도전과제
-  special,  // 특별 도전과제
-  achievement  // 업적
+  daily,
+  weekly,
+  special,
+  achievement,
 }
 
 class Challenge {
@@ -14,10 +14,10 @@ class Challenge {
   final String description;
   final ChallengeType type;
   final int requiredPoints;
-  final String environmentalImpact; // 환경 영향력 설명
-  final String rewardTitle; // 달성 시 얻는 칭호
+  final String environmentalImpact;
+  final String rewardTitle;
   final IconData icon;
-  final List<Condition> conditions; // 달성 조건들
+  final List<Condition> conditions;
   bool isCompleted;
 
   Challenge({
@@ -55,7 +55,7 @@ class Challenge {
     requiredPoints: json['requiredPoints'],
     environmentalImpact: json['environmentalImpact'],
     rewardTitle: json['rewardTitle'],
-    icon: Icons.emoji_events, // 기본 아이콘
+    icon: Icons.emoji_events,
     conditions: (json['conditions'] as List)
         .map((c) => Condition.fromJson(c))
         .toList(),
@@ -102,7 +102,6 @@ class Condition {
 // 도전과제 데이터
 class ChallengeData {
   static List<Challenge> get defaultChallenges => [
-    // 금연 재테크 관련 도전과제
     Challenge(
       id: 'finance_1',
       title: '금연 재테크 입문자',
@@ -119,91 +118,46 @@ class ChallengeData {
         ),
       ],
     ),
-    Challenge(
-      id: 'finance_2',
-      title: '금연 재테크 전문가',
-      description: '금연으로 50만원 절약하기',
-      type: ChallengeType.achievement,
-      requiredPoints: 500,
-      environmentalImpact: '절약한 비용으로 작은 숲을 만들 수 있어요',
-      rewardTitle: '금연 재테크의 달인',
-      icon: Icons.account_balance,
-      conditions: [
-        Condition(
-          description: '50만원 절약하기',
-          targetValue: 500000,
-        ),
-      ],
-    ),
-
-    // 환경 보호 관련 도전과제
-    Challenge(
-      id: 'environment_1',
-      title: '지구를 지키는 금연인',
-      description: '100개비의 담배로부터 지구 지키기',
-      type: ChallengeType.achievement,
-      requiredPoints: 200,
-      environmentalImpact: '담배 100개비는 약 20L의 깨끗한 물을 오염시킬 수 있어요',
-      rewardTitle: '지구 수호자',
-      icon: Icons.eco,
-      conditions: [
-        Condition(
-          description: '100개비 참기',
-          targetValue: 100,
-        ),
-      ],
-    ),
-    Challenge(
-      id: 'environment_2',
-      title: '숲을 만드는 금연인',
-      description: '1000개비의 담배로부터 지구 지키기',
-      type: ChallengeType.achievement,
-      requiredPoints: 1000,
-      environmentalImpact: '1년 동안 버려지는 담배꽁초로 인한 환경오염을 줄였어요',
-      rewardTitle: '숲의 수호자',
-      icon: Icons.forest,
-      conditions: [
-        Condition(
-          description: '1000개비 참기',
-          targetValue: 1000,
-        ),
-      ],
-    ),
-
-    // 건강 관련 도전과제
-    Challenge(
-      id: 'health_1',
-      title: '건강한 첫걸음',
-      description: '7일 연속 금연 성공',
-      type: ChallengeType.special,
-      requiredPoints: 150,
-      environmentalImpact: '당신의 폐가 회복되기 시작했어요',
-      rewardTitle: '새싹 금연인',
-      icon: Icons.favorite,
-      conditions: [
-        Condition(
-          description: '7일 연속 금연',
-          targetValue: 7,
-          requiresConsecutive: true,
-        ),
-      ],
-    ),
-    Challenge(
-      id: 'health_2',
-      title: '건강 마스터',
-      description: '30일 연속 금연 성공',
-      type: ChallengeType.special,
-      requiredPoints: 500,
-      environmentalImpact: '당신의 건강이 크게 개선되었어요',
-      rewardTitle: '건강 달인',
-      icon: Icons.workspace_premium,
-      conditions: [
-        Condition(
-          description: '30일 연속 금연',
-          targetValue: 30,
-          requiresConsecutive: true,
-        ),
-      ],
-    ),
   ];
+}
+
+// 도전과제 페이지
+class ChallengePage extends StatelessWidget {
+  final int savedMoney; // 전달된 절약한 금액
+
+  ChallengePage({required this.savedMoney});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: ChallengeData.defaultChallenges.map((challenge) {
+        // 절약 금액을 Condition의 currentValue에 업데이트
+        challenge.conditions.forEach((condition) {
+          if (condition.description.contains("절약하기")) {
+            condition.currentValue = savedMoney;
+          }
+        });
+        return ChallengeWidget(challenge: challenge);
+      }).toList(),
+    );
+  }
+}
+
+// 도전과제 위젯 (예시)
+class ChallengeWidget extends StatelessWidget {
+  final Challenge challenge;
+
+  ChallengeWidget({required this.challenge});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: Icon(challenge.icon),
+        title: Text(challenge.title),
+        subtitle: Text(
+            '${challenge.conditions.first.currentValue}/${challenge.conditions.first.targetValue}'),
+      ),
+    );
+  }
 }

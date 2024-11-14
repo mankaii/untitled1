@@ -76,17 +76,7 @@ class _ProfilePreviewState extends State<ProfilePreview> {
                   ),
                 ),
 
-              // 프레임
-              if (_equippedItems['프레임'] != null)
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      _equippedItems['프레임']!.imageAsset,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+
 
               // 반투명 그라데이션 오버레이
               Positioned.fill(

@@ -61,9 +61,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
 
     final prompt = '''
-사용자의 메시지: $text
-- 현재 ${widget.smokeFreeHours}시간 동안 금연 중
-- 공감적이고 지지적인 응답
+user's message: $text
+- 사용자가 짧은 답을 해도 대화를 이어가려는 시도를 해줘
+- 존댓말과 반말을 왔다갔다 하지말고 반말만 사용해
+- 금연을 지지하며, 응원하는 질문이나 추가적인 격려 문장을 덧붙여줘
+- 사용자와 대화가 이어질 수 있도록 자연스럽게 반응해줘
+- 담배가 낳는 악영향을 이야기해줘
 ''';
 
     try {
