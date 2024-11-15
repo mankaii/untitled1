@@ -18,6 +18,8 @@ import 'chat_screen.dart';
 import 'daily_survey_screen.dart';
 import 'health_status_screen.dart';
 import 'package:untitled1/models/daily_survey.dart';
+import 'package:untitled1/services/notification_service.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final UserSettings settings;
@@ -204,7 +206,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ],
         ),
         actions: [
-          // 프로필 버튼만 남김
+          // 알림 테스트 버튼 추가
+          IconButton(
+            onPressed: () {
+              NotificationService().showTestNotification();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('테스트 알림이 발송되었습니다.'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            icon: const Icon(Icons.notifications, color: Color(0xFF2D3142)),
+          ),
+          // 기존 프로필 버튼
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(

@@ -6,9 +6,14 @@ import 'screens/onboarding_screen.dart';
 import 'models/user_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+  await notificationService.scheduleDailyNotifications();
+
   final prefs = await SharedPreferences.getInstance();
   final userSettingsJson = prefs.getString('userSettings');
 
