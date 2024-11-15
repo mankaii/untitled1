@@ -23,16 +23,38 @@ class ChallengeScreen extends StatefulWidget {
   _ChallengeScreenState createState() => _ChallengeScreenState();
 }
 
-class _ChallengeScreenState extends State<ChallengeScreen> {
+class _ChallengeScreenState extends State<ChallengeScreen> with SingleTickerProviderStateMixin {
   List<Challenge> challenges = [];
   String? unlockedChallengeTitle;
   bool showUnlockedAnimation = false;
   late SharedPreferences prefs;
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
+  // 챌린지 트리 레벨 정의
+  final List<List<String>> challengeLevels = [
+    ['health_1'], // Level 1
+    ['finance_1', 'clean_air_1'], // Level 2
+    ['health_2'], // Level 3
+    ['finance_2', 'clean_air_2'], // Level 4
+  ];
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     initPrefs();
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> initPrefs() async {
@@ -46,9 +68,8 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
 
   void loadUnlockedStatus() {
     for (var challenge in challenges) {
-      // 이미 해금된 챌린지 여부를 SharedPreferences에서 로드
       challenge.isUnlocked = prefs.getBool(challenge.id) ?? false;
-      challenge.isNotified = challenge.isUnlocked; // 이미 해금된 경우 알림 표시 안 함
+      challenge.isNotified = challenge.isUnlocked;
     }
   }
 
@@ -57,31 +78,24 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
 
     setState(() {
       for (var challenge in challenges) {
-        // 진행 상태 업데이트
         challenge.updateProgress(
           widget.userSettings.cigarettePrice,
           widget.userSettings.cigarettesPerDay,
           widget.userSettings.quitDate,
         );
 
-        // 도전과제가 완료되었고, 아직 해금되지 않았다면
         if (challenge.isCompleted && !challenge.isUnlocked) {
           challenge.isUnlocked = true;
-          prefs.setBool(challenge.id, true); // SharedPreferences에 해금 상태 저장
+          prefs.setBool(challenge.id, true);
 
           if (!challenge.isNotified) {
             newUnlock = true;
             unlockedChallengeTitle = challenge.title;
             challenge.isNotified = true;
-
-            // 포인트 추가
             widget.onPointsEarned(challenge.pointsReward);
           }
         }
       }
-
-      // 해금된 도전과제를 가장 상단에 위치하도록 정렬
-      challenges.sort((a, b) => (b.isUnlocked ? 1 : 0).compareTo(a.isUnlocked ? 1 : 0));
     });
 
     if (newUnlock) {
@@ -101,93 +115,129 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
     });
   }
 
-  List<Challenge> getChallenges() {
-    return [
-      Challenge(
-        id: 'finance_1',
-        title: '금연 재테크 입문자',
-        description: '금연으로 10만원 절약하기',
-        type: ChallengeType.achievement,
-        requiredPoints: 100,
-        requiredSavings: 100000,
-        requiredCigarettes: 0,
-        requiredDays: 0,
-        pointsReward: 100,
-        environmentalImpact: '절약한 비용으로 나무 한 그루를 심을 수 있어요',
-        rewardTitle: '알뜰한 금연인',
-        icon: Icons.savings,
+  Widget _buildChallengeBranch(Challenge challenge, bool isLeft) {
+    final isUnlocked = challenge.isUnlocked;
+    final progress = challenge.isCompleted ? 1.0 : 0.0;
+
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Column(
+        children: [
+          CustomPaint(
+            size: Size(2, 60),
+            painter: BranchPainter(
+              progress: progress,
+              isLeft: isLeft,
+              color: isUnlocked ? Colors.deepPurpleAccent : Colors.grey,
+            ),
+          ),
+          _buildChallengeCard(challenge),
+        ],
       ),
-      Challenge(
-        id: 'finance_2',
-        title: '금연 재테크 마스터',
-        description: '금연으로 50만원 절약하기',
-        type: ChallengeType.achievement,
-        requiredPoints: 500,
-        requiredSavings: 500000,
-        requiredCigarettes: 0,
-        requiredDays: 0,
-        pointsReward: 500,
-        environmentalImpact: '절약한 비용으로 작은 숲을 만들 수 있어요',
-        rewardTitle: '금연 재테크의 달인',
-        icon: Icons.account_balance_wallet,
+    );
+  }
+
+  Widget _buildChallengeCard(Challenge challenge) {
+    final isUnlocked = challenge.isUnlocked;
+
+    return GestureDetector(
+      onTap: () {
+        if (isUnlocked) {
+          // Show challenge details
+          _showChallengeDetails(challenge);
+        }
+      },
+      child: Container(
+        width: 150,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isUnlocked
+                ? [Colors.purple[300]!, Colors.deepPurpleAccent]
+                : [Colors.grey[300]!, Colors.grey[500]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              challenge.icon,
+              color: isUnlocked ? Colors.white : Colors.grey[800],
+              size: 32,
+            ),
+            SizedBox(height: 8),
+            Text(
+              challenge.title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            if (isUnlocked)
+              Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Text(
+                  '+${challenge.pointsReward}P',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
-      Challenge(
-        id: 'clean_air_1',
-        title: '깨끗한 공기 지킴이',
-        description: '100개비의 담배로부터 지구 지키기',
-        type: ChallengeType.achievement,
-        requiredPoints: 200,
-        requiredSavings: 0,
-        requiredCigarettes: 100,
-        requiredDays: 0,
-        pointsReward: 200,
-        environmentalImpact: '담배 100개비는 약 20L의 깨끗한 물을 오염시킬 수 있어요',
-        rewardTitle: '지구 수호자',
-        icon: Icons.eco,
+    );
+  }
+
+  void _showChallengeDetails(Challenge challenge) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(challenge.title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(challenge.description),
+            SizedBox(height: 8),
+            Text(
+              '환경 영향:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(challenge.environmentalImpact),
+            SizedBox(height: 8),
+            Text(
+              '획득 칭호: ${challenge.rewardTitle}',
+              style: TextStyle(
+                color: Colors.deepPurpleAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('닫기'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
       ),
-      Challenge(
-        id: 'clean_air_2',
-        title: '미세먼지 해결사',
-        description: '500개비의 담배로부터 공기 보호하기',
-        type: ChallengeType.achievement,
-        requiredPoints: 800,
-        requiredSavings: 0,
-        requiredCigarettes: 500,
-        requiredDays: 0,
-        pointsReward: 800,
-        environmentalImpact: '500개비의 담배는 공기와 환경을 오염시킬 수 있어요',
-        rewardTitle: '미세먼지 해결사',
-        icon: Icons.filter_hdr,
-      ),
-      Challenge(
-        id: 'health_1',
-        title: '꾸준한 첫걸음',
-        description: '금연 시작 후 7일 경과',
-        type: ChallengeType.special,
-        requiredPoints: 150,
-        requiredSavings: 0,
-        requiredCigarettes: 0,
-        requiredDays: 7,
-        pointsReward: 150,
-        environmentalImpact: '당신의 폐가 회복되기 시작했어요',
-        rewardTitle: '새싹 금연인',
-        icon: Icons.favorite,
-      ),
-      Challenge(
-        id: 'health_2',
-        title: '건강한 금연 마스터',
-        description: '금연 시작 후 30일 경과',
-        type: ChallengeType.special,
-        requiredPoints: 600,
-        requiredSavings: 0,
-        requiredCigarettes: 0,
-        requiredDays: 30,
-        pointsReward: 600,
-        environmentalImpact: '30일 금연으로 건강이 크게 개선되었어요',
-        rewardTitle: '건강 달인',
-        icon: Icons.star,
-      ),
-    ];
+    );
   }
 
   @override
@@ -208,78 +258,44 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ListView.builder(
-              itemCount: challenges.length,
-              itemBuilder: (context, index) {
-                final challenge = challenges[index];
-                final isUnlocked = challenge.isUnlocked;
-                return Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: isUnlocked
-                        ? LinearGradient(
-                      colors: [Colors.purple[300]!, Colors.deepPurpleAccent],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                        : LinearGradient(
-                      colors: [Colors.grey[300]!, Colors.grey[500]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white, Colors.grey[100]!],
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Column(
+                children: challengeLevels.asMap().entries.map((entry) {
+                  final levelIndex = entry.key;
+                  final levelChallenges = entry.value;
+
+                  return Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: levelChallenges.length > 1
+                            ? MainAxisAlignment.spaceAround
+                            : MainAxisAlignment.center,
+                        children: levelChallenges.asMap().entries.map((challengeEntry) {
+                          final challenge = challenges.firstWhere(
+                                (c) => c.id == challengeEntry.value,
+                          );
+                          return _buildChallengeBranch(
+                            challenge,
+                            challengeEntry.key.isEven,
+                          );
+                        }).toList(),
                       ),
+                      SizedBox(height: 20),
                     ],
-                  ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
-                    leading: Icon(
-                      challenge.icon,
-                      color: isUnlocked ? Colors.white : Colors.grey[800],
-                      size: 32,
-                    ),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          challenge.title,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        if (isUnlocked)
-                          Text(
-                            '+${challenge.pointsReward}포인트',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber,
-                            ),
-                          ),
-                      ],
-                    ),
-                    subtitle: Text(
-                      challenge.description,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    trailing: isUnlocked && challenge.isCompleted
-                        ? Icon(Icons.check_circle, color: Colors.greenAccent, size: 30)
-                        : Icon(Icons.lock, color: Colors.white70, size: 30),
-                  ),
-                );
-              },
+                  );
+                }).toList(),
+              ),
             ),
           ),
           if (showUnlockedAnimation && unlockedChallengeTitle != null)
@@ -304,4 +320,57 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
       ),
     );
   }
+}
+
+class BranchPainter extends CustomPainter {
+  final double progress;
+  final bool isLeft;
+  final Color color;
+
+  BranchPainter({
+    required this.progress,
+    required this.isLeft,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    final path = Path();
+    if (isLeft) {
+      path.moveTo(size.width / 2, 0);
+      path.quadraticBezierTo(
+        -20,
+        size.height / 2,
+        size.width / 2,
+        size.height,
+      );
+    } else {
+      path.moveTo(size.width / 2, 0);
+      path.quadraticBezierTo(
+        size.width + 20,
+        size.height / 2,
+        size.width / 2,
+        size.height,
+      );
+    }
+
+    final pathMetrics = path.computeMetrics().first;
+    final extractPath = pathMetrics.extractPath(
+      0.0,
+      pathMetrics.length * progress,
+    );
+
+    canvas.drawPath(extractPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(BranchPainter oldDelegate) =>
+      progress != oldDelegate.progress ||
+          isLeft != oldDelegate.isLeft ||
+          color != oldDelegate.color;
 }
