@@ -26,14 +26,14 @@ class HealthStatus {
   // 금연 시간에 따른 건강 개선도 계산
   static double calculateLungCapacity(int hours) {
     // 의학적 데이터 기반 계산
-    return (hours / 720) * 30; // 30일 기준 최대 30% 개선
+    return (hours / 87600) * 100; // 10년 기준 최대 100% 개선
   }
 
   static double calculateBloodCirculation(int hours) {
-    return (hours / 168) * 100; // 7일 기준 100% 개선
+    return (hours / 2190) * 100; // 3개월 기준 100% 개선
   }
 
   static double calculateNicotineLevel(int hours) {
-    return 100 - ((hours / 72) * 100).clamp(0, 100); // 3일 기준 100% 감소
+    return 100 - ((hours / 336) * 100).clamp(0, 100); // 2주 기준 100% 감소
   }
 }
