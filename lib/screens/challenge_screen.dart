@@ -245,13 +245,27 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
                       color: isUnlocked ? Colors.white : Colors.grey[800],
                       size: 32,
                     ),
-                    title: Text(
-                      challenge.title,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          challenge.title,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (isUnlocked)
+                          Text(
+                            '+${challenge.pointsReward}포인트',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                            ),
+                          ),
+                      ],
                     ),
                     subtitle: Text(
                       challenge.description,
