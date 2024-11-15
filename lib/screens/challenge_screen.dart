@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../models/challenge.dart';
 import '../models/user_settings.dart';
@@ -8,14 +9,14 @@ class ChallengeScreen extends StatefulWidget {
   final Function(int) onPointsEarned;
   final int savedMoney;
   final int savedCigarettes;
-  final int consecutiveDays; // consecutiveDays 매개변수 추가
+  final int consecutiveDays;
 
   ChallengeScreen({
     required this.userSettings,
     required this.onPointsEarned,
     required this.savedMoney,
     required this.savedCigarettes,
-    required this.consecutiveDays, // required 추가
+    required this.consecutiveDays,
   });
 
   @override
@@ -26,35 +27,60 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
   List<Challenge> challenges = [];
   String? unlockedChallengeTitle;
   bool showUnlockedAnimation = false;
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
+    initPrefs();
+  }
+
+  Future<void> initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
     challenges = getChallenges();
+    loadUnlockedStatus();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateChallenges();
     });
   }
 
+  void loadUnlockedStatus() {
+    for (var challenge in challenges) {
+      // 이미 해금된 챌린지 여부를 SharedPreferences에서 로드
+      challenge.isUnlocked = prefs.getBool(challenge.id) ?? false;
+      challenge.isNotified = challenge.isUnlocked; // 이미 해금된 경우 알림 표시 안 함
+    }
+  }
+
   void updateChallenges() {
     bool newUnlock = false;
+
     setState(() {
       for (var challenge in challenges) {
+        // 진행 상태 업데이트
         challenge.updateProgress(
           widget.userSettings.cigarettePrice,
           widget.userSettings.cigarettesPerDay,
           widget.userSettings.quitDate,
         );
 
+        // 도전과제가 완료되었고, 아직 해금되지 않았다면
         if (challenge.isCompleted && !challenge.isUnlocked) {
           challenge.isUnlocked = true;
+          prefs.setBool(challenge.id, true); // SharedPreferences에 해금 상태 저장
+
           if (!challenge.isNotified) {
             newUnlock = true;
             unlockedChallengeTitle = challenge.title;
             challenge.isNotified = true;
+
+            // 포인트 추가
+            widget.onPointsEarned(challenge.pointsReward);
           }
         }
       }
+
+      // 해금된 도전과제를 가장 상단에 위치하도록 정렬
       challenges.sort((a, b) => (b.isUnlocked ? 1 : 0).compareTo(a.isUnlocked ? 1 : 0));
     });
 
@@ -86,6 +112,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 100000,
         requiredCigarettes: 0,
         requiredDays: 0,
+        pointsReward: 100,
         environmentalImpact: '절약한 비용으로 나무 한 그루를 심을 수 있어요',
         rewardTitle: '알뜰한 금연인',
         icon: Icons.savings,
@@ -99,6 +126,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 500000,
         requiredCigarettes: 0,
         requiredDays: 0,
+        pointsReward: 500,
         environmentalImpact: '절약한 비용으로 작은 숲을 만들 수 있어요',
         rewardTitle: '금연 재테크의 달인',
         icon: Icons.account_balance_wallet,
@@ -112,6 +140,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 0,
         requiredCigarettes: 100,
         requiredDays: 0,
+        pointsReward: 200,
         environmentalImpact: '담배 100개비는 약 20L의 깨끗한 물을 오염시킬 수 있어요',
         rewardTitle: '지구 수호자',
         icon: Icons.eco,
@@ -125,6 +154,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 0,
         requiredCigarettes: 500,
         requiredDays: 0,
+        pointsReward: 800,
         environmentalImpact: '500개비의 담배는 공기와 환경을 오염시킬 수 있어요',
         rewardTitle: '미세먼지 해결사',
         icon: Icons.filter_hdr,
@@ -138,6 +168,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 0,
         requiredCigarettes: 0,
         requiredDays: 7,
+        pointsReward: 150,
         environmentalImpact: '당신의 폐가 회복되기 시작했어요',
         rewardTitle: '새싹 금연인',
         icon: Icons.favorite,
@@ -151,6 +182,7 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
         requiredSavings: 0,
         requiredCigarettes: 0,
         requiredDays: 30,
+        pointsReward: 600,
         environmentalImpact: '30일 금연으로 건강이 크게 개선되었어요',
         rewardTitle: '건강 달인',
         icon: Icons.star,
