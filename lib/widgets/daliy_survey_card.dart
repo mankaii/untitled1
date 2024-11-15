@@ -57,8 +57,14 @@ class DailySurveyCard extends StatelessWidget {
                     Colors.green.shade100,
                   ]
                       : [
-                    Theme.of(context).primaryColor.withOpacity(0.1),
-                    Theme.of(context).primaryColor.withOpacity(0.2),
+                    Theme
+                        .of(context)
+                        .primaryColor
+                        .withOpacity(0.1),
+                    Theme
+                        .of(context)
+                        .primaryColor
+                        .withOpacity(0.2),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -72,13 +78,17 @@ class DailySurveyCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: hasCompleted
                               ? Colors.green
-                              : Theme.of(context).primaryColor,
+                              : Theme
+                              .of(context)
+                              .primaryColor,
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
                               color: (hasCompleted
                                   ? Colors.green
-                                  : Theme.of(context).primaryColor)
+                                  : Theme
+                                  .of(context)
+                                  .primaryColor)
                                   .withOpacity(0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
@@ -135,7 +145,9 @@ class DailySurveyCard extends StatelessWidget {
                           Icons.chevron_right,
                           color: hasCompleted
                               ? Colors.green
-                              : Theme.of(context).primaryColor,
+                              : Theme
+                              .of(context)
+                              .primaryColor,
                         ),
                       ),
                     ],
@@ -148,7 +160,9 @@ class DailySurveyCard extends StatelessWidget {
                         value: 0.0,
                         backgroundColor: Colors.white.withOpacity(0.5),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor,
+                          Theme
+                              .of(context)
+                              .primaryColor,
                         ),
                         minHeight: 6,
                       ),
@@ -161,7 +175,24 @@ class DailySurveyCard extends StatelessWidget {
                         color: Colors.grey[600],
                       ),
                     ),
-                  ],
+                  ] else
+                    ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Icon(Icons.stars, color: Colors.amber),
+                          const SizedBox(width: 8),
+                          Text(
+                            '30포인트 획득!',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.green[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                 ],
               ),
             ),
