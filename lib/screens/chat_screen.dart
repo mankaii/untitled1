@@ -36,15 +36,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final response = await GeminiService.getResponse(prompt);
+      if (response.trim().isEmpty) {
+        throw Exception('Empty response');
+      }
       setState(() {
         _messages.add(ChatMessage(text: response, isUser: false));
         _isTyping = false;
       });
+      _scrollToBottom();
     } catch (e) {
       setState(() => _isTyping = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('메시지 전송 중 오류가 발생했습니다.'),
+          content: Text('메시지 전송 중 오류가 발생했습니다. 다시 시도해주세요.'),
           backgroundColor: darkPurple,
         ),
       );
