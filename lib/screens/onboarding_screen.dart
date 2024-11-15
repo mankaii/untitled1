@@ -310,47 +310,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildGoalPage() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             '금연 목표를 설정해주세요',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           TextFormField(
             controller: _goalController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: '목표',
               hintText: '예: 가족들과 건강하게 지내기',
             ),
-            maxLines: 2,
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now().add(const Duration(days: 30)),
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
-              );
-              if (picked != null) {
-                setState(() {
-                  _targetDate = picked;
-                });
-              }
+            maxLines: 1,
+            onChanged: (value) {
+              // 입력값이 변경될 때마다 상태 업데이트
+              setState(() {});
             },
-            icon: const Icon(Icons.calendar_today),
-            label: Text(
-              _targetDate == null
-                  ? '목표 날짜 선택하기'
-                  : DateFormat('yyyy년 MM월 dd일').format(_targetDate!),
-            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return '금연 목표를 입력해주세요';
+              }
+              return null;
+            },
           ),
         ],
       ),
@@ -379,7 +364,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -387,26 +372,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             TextButton(
               onPressed: () {
                 _pageController.previousPage(
-                  duration: const Duration(milliseconds: 300),
+                  duration: Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
               },
-              child: const Text('이전'),
+              child: Text('이전'),
             )
           else
-            const SizedBox(width: 80),
+            SizedBox(width: 80),
           Text('${_currentPage + 1}/5'),
           TextButton(
-            onPressed: canProceed
-                ? _currentPage == 4
-                ? _submitForm
+            onPressed: _currentPage == 4
+                ? (_goalController.text.isNotEmpty ? _submitForm : null)
                 : () {
               _pageController.nextPage(
-                duration: const Duration(milliseconds: 300),
+                duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
-            }
-                : null,
+            },
             child: Text(_currentPage == 4 ? '시작하기' : '다음'),
           ),
         ],

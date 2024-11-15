@@ -300,13 +300,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setString('equippedItems', equippedJson);
   }
 
-  void _equipItem(ProfileItem item) {
-    setState(() {
-      _equippedItems[item.category] = item;
-    });
-    _saveEquippedItems();
-
-    context.read<ProfileProvider>().updateEquippedItem(item.category, item);
+  void _equipItem(ProfileItem item) async {
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    await provider.equipItem(item);
+    // 즉시 UI 업데이트
+    setState(() {});
   }
 
   @override
