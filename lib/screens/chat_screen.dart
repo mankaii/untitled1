@@ -144,7 +144,7 @@ user's message: $text
             image: const AssetImage('assets/chat_bg.png'), // 배경 이미지가 있다면 사용
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              backgroundPurple.withOpacity(0.95),
+              backgroundPurple.withOpacity(1),
               BlendMode.overlay,
             ),
           ),
