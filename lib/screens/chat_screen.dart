@@ -139,7 +139,7 @@ user's message: $text
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: const AssetImage('assets/image.png'), // 배경 이미지가 있다면 사용
+            image: const AssetImage('assets/chat_bg.png'), // 배경 이미지가 있다면 사용
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               backgroundPurple.withOpacity(1),
