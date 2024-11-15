@@ -304,7 +304,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         const SizedBox(height: 24),
                         goals.GoalCard(
                           goal: widget.settings.goal ?? '목표를 설정해주세요',
-                          quitDate: widget.settings.quitDate,
+                          quitDate: widget.settings.quitDate, // quitDate를 추가로 전달
+                          targetDate: widget.settings.targetDate, // targetDate도 전달
                         ),
                         const SizedBox(height: 24),
                         achievements.AchievementCard(

@@ -21,11 +21,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _goalController = TextEditingController();
 
   DateTime? _quitDate;
+  DateTime? _targetDate; // 목표일자 추가
   String _nickname = '';
   String _cigaretteType = '연초';
   int _cigarettesPerDay = 0;
   String? _goal;
-  DateTime? _targetDate;
   int _currentPage = 0;
 
   final List<CigaretteType> _cigaretteTypes = [
@@ -122,18 +122,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '반갑습니다!',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineMedium,
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 8),
           Text(
             '금연을 결심하신 것을 축하드립니다.',
-            style: Theme
-                .of(context)
-                .textTheme
-                .bodyLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -162,10 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '어떤 담배를 피우시나요?',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -200,25 +191,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Icon(
                 _cigaretteTypes[index].icon,
                 size: 64,
-                color: Theme
-                    .of(context)
-                    .primaryColor,
+                color: Theme.of(context).primaryColor,
               ),
               const SizedBox(height: 16),
               Text(
                 _cigaretteTypes[index].name,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleLarge,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
                 _cigaretteTypes[index].description,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),
@@ -235,10 +218,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '하루에 몇 개비를 피우시나요?',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 32),
           TextFormField(
@@ -276,10 +256,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             '언제부터 시작하시나요?',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 32),
           OutlinedButton.icon(
@@ -310,7 +287,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildGoalPage() {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -318,24 +295,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             '금연 목표를 설정해주세요',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          SizedBox(height: 32),
+          const SizedBox(height: 16),
           TextFormField(
             controller: _goalController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: '목표',
               hintText: '예: 가족들과 건강하게 지내기',
             ),
             maxLines: 1,
-            onChanged: (value) {
-              // 입력값이 변경될 때마다 상태 업데이트
-              setState(() {});
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return '금연 목표를 입력해주세요';
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              );
+              if (picked != null) {
+                setState(() {
+                  _targetDate = picked;
+                });
               }
-              return null;
             },
+            icon: const Icon(Icons.calendar_today),
+            label: Text(
+              _targetDate == null
+                  ? '목표일자 선택하기'
+                  : DateFormat('yyyy년 MM월 dd일').format(_targetDate!),
+            ),
           ),
         ],
       ),
@@ -350,7 +339,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         canProceed = _nicknameController.text.isNotEmpty;
         break;
       case 1:
-        canProceed = true; // 담배 종류는 기본값이 있음
+        canProceed = true;
         break;
       case 2:
         canProceed = _smokingAmountController.text.isNotEmpty;
@@ -364,7 +353,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -372,21 +361,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             TextButton(
               onPressed: () {
                 _pageController.previousPage(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
               },
-              child: Text('이전'),
+              child: const Text('이전'),
             )
           else
-            SizedBox(width: 80),
+            const SizedBox(width: 80),
           Text('${_currentPage + 1}/5'),
           TextButton(
             onPressed: _currentPage == 4
                 ? (_goalController.text.isNotEmpty ? _submitForm : null)
                 : () {
               _pageController.nextPage(
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
             },
@@ -401,34 +390,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      if (_quitDate == null) {
+      if (_quitDate == null || _targetDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('금연 시작일을 선택해주세요')),
-        );
-        return;
-      }
-
-      if (_goalController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('금연 목표를 입력해주세요')),
-        );
-        return;
-      }
-
-      if (_smokingAmountController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('하루 흡연량을 입력해주세요')),
+          const SnackBar(content: Text('필수 정보를 입력해주세요')),
         );
         return;
       }
 
       final settings = UserSettings(
-          quitDate: _quitDate!,
-          nickname: _nicknameController.text.trim(),
-          cigaretteType: _cigaretteType,
-          cigarettesPerDay: int.parse(_smokingAmountController.text),
-          cigarettePrice: 4500,
-          goal: _goalController.text.trim()
+        quitDate: _quitDate!,
+        nickname: _nicknameController.text.trim(),
+        cigaretteType: _cigaretteType,
+        cigarettesPerDay: int.parse(_smokingAmountController.text),
+        cigarettePrice: 4500,
+        goal: _goalController.text.trim(),
+        targetDate: _targetDate,
       );
 
       final prefs = await SharedPreferences.getInstance();

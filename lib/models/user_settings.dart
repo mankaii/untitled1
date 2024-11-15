@@ -5,15 +5,16 @@ class UserSettings {
   final int cigarettesPerDay;
   final int cigarettePrice;
   final String? goal;
-  // targetDate 제거
+  final DateTime? targetDate; // 목표일자 추가
 
   UserSettings({
     required this.quitDate,
     required this.nickname,
     required this.cigaretteType,
     required this.cigarettesPerDay,
-    this.cigarettePrice = 4500,
+    required this.cigarettePrice,
     this.goal,
+    this.targetDate, // 필드 초기화
   });
 
   Map<String, dynamic> toJson() => {
@@ -23,6 +24,7 @@ class UserSettings {
     'cigarettesPerDay': cigarettesPerDay,
     'cigarettePrice': cigarettePrice,
     'goal': goal,
+    'targetDate': targetDate?.toIso8601String(), // JSON 변환
   };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
@@ -30,7 +32,10 @@ class UserSettings {
     nickname: json['nickname'],
     cigaretteType: json['cigaretteType'],
     cigarettesPerDay: json['cigarettesPerDay'],
-    cigarettePrice: json['cigarettePrice'] ?? 4500,
+    cigarettePrice: json['cigarettePrice'],
     goal: json['goal'],
+    targetDate: json['targetDate'] != null
+        ? DateTime.parse(json['targetDate'])
+        : null, // JSON 읽기
   );
 }
