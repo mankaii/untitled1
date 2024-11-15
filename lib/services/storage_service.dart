@@ -1,12 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/user_settings.dart';
-import '../models/diary_entry.dart';
 import '../models/profile_item.dart';
 
 class StorageService {
   static const String userSettingsKey = 'userSettings';
-  static const String diaryEntriesKey = 'diaryEntries';
   static const String unlockedItemsKey = 'unlockedItems';
   static const String equippedItemsKey = 'equippedItems';
 
@@ -22,24 +20,6 @@ class StorageService {
       return UserSettings.fromJson(jsonDecode(settingsJson));
     }
     return null;
-  }
-
-  static Future<void> saveDiaryEntry(DiaryEntry entry) async {
-    final prefs = await SharedPreferences.getInstance();
-    final entries = await getDiaryEntries();
-    entries.add(entry);
-    await prefs.setStringList(
-      diaryEntriesKey,
-      entries.map((e) => jsonEncode(e.toJson())).toList(),
-    );
-  }
-
-  static Future<List<DiaryEntry>> getDiaryEntries() async {
-    final prefs = await SharedPreferences.getInstance();
-    final entriesJson = prefs.getStringList(diaryEntriesKey) ?? [];
-    return entriesJson
-        .map((json) => DiaryEntry.fromJson(jsonDecode(json)))
-        .toList();
   }
 
   static Future<void> saveUnlockedItems(List<String> itemIds) async {
