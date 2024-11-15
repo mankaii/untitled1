@@ -63,10 +63,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final prompt = '''
 user's message: $text
 - 사용자가 짧은 답을 해도 대화를 이어가려는 시도를 해줘
-- 존댓말과 반말을 왔다갔다 하지말고 반말만 사용해
 - 금연을 지지하며, 응원하는 질문이나 추가적인 격려 문장을 덧붙여줘
-- 사용자와 대화가 이어질 수 있도록 자연스럽게 반응해줘
-- 담배가 낳는 악영향을 이야기해줘
+- 담배가 낳는 악영향을 대화에 어우러지게 말해줘
 ''';
 
     try {
@@ -141,7 +139,7 @@ user's message: $text
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: const AssetImage('assets/chat_bg.png'), // 배경 이미지가 있다면 사용
+            image: const AssetImage('assets/image.png'), // 배경 이미지가 있다면 사용
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               backgroundPurple.withOpacity(1),
