@@ -14,6 +14,7 @@ class Challenge {
   final String environmentalImpact;
   final String rewardTitle;
   final IconData icon;
+  final int pointsReward;
 
   int currentSavings = 0;
   int currentCigarettes = 0;
@@ -33,6 +34,7 @@ class Challenge {
     required this.environmentalImpact,
     required this.rewardTitle,
     required this.icon,
+    required this.pointsReward,
   });
 
   // 절약 금액과 개비 수 및 경과 날짜 계산

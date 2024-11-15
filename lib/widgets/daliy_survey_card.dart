@@ -118,7 +118,7 @@ class DailySurveyCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               hasCompleted
-                                  ? '수고하셨어요! 내일도 함께해요 💪'
+                                  ? '💪수고하셨어요 매일 함께해요!'
                                   : '오늘 하루는 어떠셨나요? 📝',
                               style: TextStyle(
                                 fontSize: 14,
@@ -177,22 +177,7 @@ class DailySurveyCard extends StatelessWidget {
                     ),
                   ] else
                     ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          const Icon(Icons.stars, color: Colors.amber),
-                          const SizedBox(width: 8),
-                          Text(
-                            '30포인트 획득!',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.green[800],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                                          ],
                 ],
               ),
             ),
