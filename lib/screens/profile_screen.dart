@@ -33,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadEquippedItems();
     _checkAndUnlockItems();
   }
+
   // 아이템 초기 데이터
   void _loadItems() {
     _items = [
@@ -303,322 +304,339 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _equipItem(ProfileItem item) async {
     final provider = Provider.of<ProfileProvider>(context, listen: false);
     await provider.equipItem(item);
-    // 즉시 UI 업데이트
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: Text('프로필 꾸미기'),
-    actions: [
-    Center(
-    child: Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.0),
-    child: Row(
-    children: [
-    Icon(Icons.stars, color: Colors.amber),
-    SizedBox(width: 4),
-    Text(
-    '${widget.currentPoints}P',
-    style: TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    ),
-    ),
-    ],
-    ),
-    ),
-    ),
-    ],
-    ),
-    body: Column(
-    children: [
-    // 프로필 미리보기
-    Container(
-    height: 400,
-    margin: EdgeInsets.all(16),
-    decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-    BoxShadow(
-    color: Colors.black12,
-    blurRadius: 10,
-    spreadRadius: 1,
-    ),
-    ],
-    ),
-    child: Stack(
-    children: [
-    // 배경
-    if (_equippedItems['배경'] != null)
-    Positioned.fill(
-    child: ClipRRect(
-    borderRadius: BorderRadius.circular(16),
-    child: Image.asset(
-    _equippedItems['배경']!.imageAsset,
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-    print(
-    'Error loading background: ${_equippedItems['배경']!
-        .imageAsset}');
-    return Container(color: Colors.grey[100]);
-    },
-    ),
-    ),
-    ),
-    // 캐릭터
-    if (_equippedItems['캐릭터'] != null)
-    Center(
-    child: Image.asset(
-    _equippedItems['캐릭터']!.imageAsset,
-    height: 400,
-    errorBuilder: (context, error, stackTrace) {
-    print('Error loading character: ${_equippedItems['캐릭터']!
-        .imageAsset}');
-    return Icon(Icons.person, size: 80, color: Colors.grey);
-    },
-    ),
-    ),
-
-    // 뱃지
-    if (_equippedItems['뱃지'] != null)
-    Positioned(
-    top: 20,
-    right: 10,
-    child: Image.asset(
-    _equippedItems['뱃지']!.imageAsset,
-    height: 50,
-    errorBuilder: (context, error, stackTrace) {
-    print('Error loading badge: ${_equippedItems['뱃지']!
-        .imageAsset}');
-    return Icon(Icons.stars, size: 30, color: Colors.amber);
-    },
-    ),
-    ),
-    ],
-    ),
-    ),// 카테고리 선택
-      Container(
-        height: 50,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: _categories.length,
-          itemBuilder: (context, index) {
-            final category = _categories[index];
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: ChoiceChip(
-                label: Text(category),
-                selected: _selectedCategory == category,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedCategory = category;
-                  });
+        actions: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Consumer<ProfileProvider>(
+                builder: (context, provider, _) {
+                  return Row(
+                    children: [
+                      Icon(Icons.stars, color: Colors.amber),
+                      SizedBox(width: 4),
+                      Text(
+                        '${widget.currentPoints}P',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  );
                 },
               ),
-            );
-          },
-        ),
-      ),
-
-      // 아이템 목록
-      Expanded(
-        child: GridView.builder(
-          padding: EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            ),
           ),
-          itemCount: _items
-              .where((item) => item.category == _selectedCategory)
-              .length,
-          itemBuilder: (context, index) {
-            final item = _items
-                .where((item) => item.category == _selectedCategory)
-                .toList()[index];
-            final isLocked = item.requiredPoints > widget.currentPoints;
-            final isEquipped = _equippedItems[item.category]?.id == item.id;
-
-            return GestureDetector(
-              onTap: isLocked
-                  ? () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${item.requiredPoints}P가 필요합니다. (현재: ${widget
-                          .currentPoints}P)',
-                    ),
-                  ),
-                );
-              }
-                  : () => _equipItem(item),
-              child: Card(
-                elevation: isEquipped ? 8 : 2,
-                shape: RoundedRectangleBorder(
+        ],
+      ),
+      body: Consumer<ProfileProvider>(
+        builder: (context, provider, _) {
+          final equippedItems = provider.equippedItems;
+          return Column(
+            children: [
+              // 프로필 미리보기
+              Container(
+                height: 400,
+                margin: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  side: isEquipped
-                      ? BorderSide(color: Theme
-                      .of(context)
-                      .primaryColor, width: 2)
-                      : BorderSide.none,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Image.asset(
-                                    item.imageAsset,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error,
-                                        stackTrace) {
-                                      print('Error loading item: ${item
-                                          .imageAsset}');
-                                      return Icon(
-                                        Icons.image_not_supported,
-                                        size: 40,
-                                        color: Colors.grey,
-                                      );
-                                    },
-                                  ),
-                                ),
-                                if (isLocked)
-                                  Container(
-                                    color: Colors.black45,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .center,
-                                        children: [
-                                          Icon(
-                                            Icons.lock,
-                                            color: Colors.white,
-                                            size: 32,
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            '${item.requiredPoints}P 필요',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
+                    // 배경
+                    if (equippedItems['배경'] != null)
+                      Positioned.fill(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            equippedItems['배경']!.imageAsset,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              print(
+                                  'Error loading background: ${equippedItems['배경']!
+                                      .imageAsset}');
+                              return Container(color: Colors.grey[100]);
+                            },
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.name,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _getTierColor(item.tier),
-                                        borderRadius: BorderRadius.circular(
-                                            8),
-                                      ),
-                                      child: Text(
-                                        'Tier ${item.tier}',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  item.description,
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
+                      ),
+                    // 캐릭터
+                    if (equippedItems['캐릭터'] != null)
+                      Center(
+                        child: Image.asset(
+                          equippedItems['캐릭터']!.imageAsset,
+                          height: 400,
+                          errorBuilder: (context, error, stackTrace) {
+                            print(
+                                'Error loading character: ${equippedItems['캐릭터']!
+                                    .imageAsset}');
+                            return Icon(
+                                Icons.person, size: 80, color: Colors.grey);
+                          },
                         ),
-                      ],
-                    ),
-                    if (isEquipped)
+                      ),
+
+                    // 뱃지
+                    if (equippedItems['뱃지'] != null)
                       Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme
-                                .of(context)
-                                .primaryColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '착용중',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
+                        top: 20,
+                        right: 10,
+                        child: Image.asset(
+                          equippedItems['뱃지']!.imageAsset,
+                          height: 50,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Error loading badge: ${equippedItems['뱃지']!
+                                .imageAsset}');
+                            return Icon(
+                                Icons.stars, size: 30, color: Colors.amber);
+                          },
                         ),
                       ),
                   ],
                 ),
               ),
-            );
-          },
-        ),
+
+              // 카테고리 선택
+              Container(
+                height: 50,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _categories.length,
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: ChoiceChip(
+                        label: Text(category),
+                        selected: _selectedCategory == category,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // 아이템 목록
+              Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: _items
+                      .where((item) => item.category == _selectedCategory)
+                      .length,
+                  itemBuilder: (context, index) {
+                    final item = _items
+                        .where((item) => item.category == _selectedCategory)
+                        .toList()[index];
+                    final isLocked = item.requiredPoints > widget.currentPoints;
+                    final isEquipped = equippedItems[item.category]?.id ==
+                        item.id;
+
+                    return GestureDetector(
+                      onTap: isLocked
+                          ? () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${item.requiredPoints}P가 필요합니다. (현재: ${widget
+                                  .currentPoints}P)',
+                            ),
+                          ),
+                        );
+                      }
+                          : () => provider.equipItem(item),
+                      child: Card(
+                        elevation: isEquipped ? 8 : 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: isEquipped
+                              ? BorderSide(color: Theme
+                              .of(context)
+                              .primaryColor, width: 2)
+                              : BorderSide.none,
+                        ),
+                        child: Stack(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Center(
+                                          child: Image.asset(
+                                            item.imageAsset,
+                                            fit: BoxFit.contain,
+                                            errorBuilder: (context, error,
+                                                stackTrace) {
+                                              print('Error loading item: ${item
+                                                  .imageAsset}');
+                                              return Icon(
+                                                Icons.image_not_supported,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        if (isLocked)
+                                          Container(
+                                            color: Colors.black45,
+                                            child: Center(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.lock,
+                                                    color: Colors.white,
+                                                    size: 32,
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    '${item
+                                                        .requiredPoints}P 필요',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight
+                                                          .bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                item.name,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: _getTierColor(item.tier),
+                                                borderRadius: BorderRadius
+                                                    .circular(8),
+                                              ),
+                                              child: Text(
+                                                'Tier ${item.tier}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          item.description,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (isEquipped)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme
+                                        .of(context)
+                                        .primaryColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '착용중',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
-    ],
-    ),
     );
-  }}
+  }
+}
 
 // _getTierColor 메서드
 Color _getTierColor(int tier) {

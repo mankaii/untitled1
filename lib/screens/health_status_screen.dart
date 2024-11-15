@@ -9,7 +9,8 @@ import 'package:untitled1/models/daily_survey.dart';
 import '../services/gemini_service.dart';
 
 // Chart 라이브러리를 사용하려면 (선택사항)
-// import 'package:fl_chart/fl_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
+
 class HealthStatusScreen extends StatefulWidget {
   final UserSettings settings;
   final List<DailySurvey> surveys;

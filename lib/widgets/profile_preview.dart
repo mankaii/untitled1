@@ -20,53 +20,56 @@ class ProfilePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onProfileTap,
-      child: Card(
-        elevation: 8,
-        shape: RoundedRectangleBorder(
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          height: 200,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Theme.of(context).primaryColor.withOpacity(0.1),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
               // 배경
               if (equippedItems['배경'] != null)
                 Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      equippedItems['배경']!.imageAsset,
-                      fit: BoxFit.cover,
+                  child: Image.asset(
+                    equippedItems['배경']!.imageAsset,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+              // 그라데이션 오버레이
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7),
+                      ],
                     ),
                   ),
                 ),
+              ),
 
               // 캐릭터
               if (equippedItems['캐릭터'] != null)
-                Center(
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                   child: Image.asset(
                     equippedItems['캐릭터']!.imageAsset,
-                    height: 120,
-                  ),
-                ),
-
-              // 프레임
-              if (equippedItems['프레임'] != null)
-                Positioned.fill(
-                  child: Image.asset(
-                    equippedItems['프레임']!.imageAsset,
-                    fit: BoxFit.contain,
+                    height: 160,
                   ),
                 ),
 
@@ -78,15 +81,11 @@ class ProfilePreview extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
                     ),
                     child: Image.asset(
                       equippedItems['뱃지']!.imageAsset,
@@ -97,7 +96,7 @@ class ProfilePreview extends StatelessWidget {
 
               // 포인트 표시
               Positioned(
-                bottom: 16,
+                top: 16,
                 left: 16,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -105,14 +104,16 @@ class ProfilePreview extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Theme
+                        .of(context)
+                        .primaryColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.stars,
-                        color: Colors.amber,
+                        color: Colors.white,
                         size: 20,
                       ),
                       const SizedBox(width: 4),
@@ -131,49 +132,36 @@ class ProfilePreview extends StatelessWidget {
               // 커스터마이즈 힌트
               Positioned(
                 bottom: 16,
-                right: 16,
+                left: 16,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
-                    children: const [
+                    children: [
                       Icon(
                         Icons.edit,
-                        color: Colors.white,
+                        color: Theme
+                            .of(context)
+                            .primaryColor,
                         size: 16,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         '꾸미기',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme
+                              .of(context)
+                              .primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-
-              // 반짝이는 효과
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withOpacity(0.2),
-                        Colors.transparent,
-                      ],
-                    ),
                   ),
                 ),
               ),
